@@ -21,4 +21,5 @@ function drawCovEllipse(c, Cov, setting)
     end
     plot(rot(1,:), rot(2,:), setting);
     axis equal;
+    pause(0.01);
 end

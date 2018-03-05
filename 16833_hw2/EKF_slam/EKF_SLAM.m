@@ -6,8 +6,8 @@
 clear;
 
 %==== TEST: Setup uncertianty parameters (try different values!) ===
-sig_x = 0.2;
-sig_y = 0.2;
+sig_x = 0.25;
+sig_y = 0.1;
 sig_alpha = 0.1;
 sig_beta = 0.08;
 sig_r = 0.01;
@@ -49,7 +49,7 @@ for i = 1:2:numel(measure)
     landmark(i+1) = pose(2) + r * sin(beta + pose(3));
 end
 
-landmark_cov = diag(ones(1, 2*k)*0.2);
+landmark_cov = diag(ones(1, 2*k)*0.02);
 
 %==== Setup state vector x with pose and landmark vector ====
 x = [pose ; landmark];
@@ -104,31 +104,48 @@ while ischar(tline)
     %==== (Notice: update state x[] and covariance P[] using input measurement data and measure_cov[]) ====
     
     % Write your code here...
-        for i = 1:2:numel(measure)
+    for i = 1:2:numel(measure)
         r = measure(i+1);
         phi = measure(1);
         
         z = [r; ...
              phi];
         
-        delta = [landmark(i) - x_pre(1); ...
-                 landmark(i+1) - x_pre(2)];
+        delta = [x_pre(i+3) - x_pre(1); ...
+                 x_pre(i+4) - x_pre(2)];
         
         q = delta' * delta;
         
         z_est = [sqrt(q); ...
                  atan2(delta(2), delta(1)) - x_pre(3)];
-        
+        %{
+        lm_count = ceil(i/2);
         col13 = [eye(3); zeros(2,3)];
-        colobs = zeros(5, 10);
-        collast = [zeros(3, 2); eye(2)];
-        F = [col13 colobs collast];
+        colobs = zeros(5, 2*lm_count - 2);
+        collm = [zeros(3, 2); eye(2)];
+        collast = zeros(5, 2*k - 2*lm_count);
+        F = [col13 colobs collm collast];
         
         H_low = (1/q) * [-sqrt(q)*delta(1) -sqrt(q)*delta(2) 0 sqrt(q)*delta(1) sqrt(q)*delta(2); ...
                          delta(2) -delta(1) -q -delta(2) delta(1)] ;
         H = H_low * F;
+        %}
+        lm_count = ceil(i/2);
+
+        colobs = zeros(2, 2*lm_count - 2);
+        collm =  eye(2);
+        collast = zeros(2, 2*k - 2*lm_count);
+        F = [colobs collm collast];
         
-        K = P_pre * H'  * ( H * P_pre * H' + measure_cov)^-1;
+        Hp = (1/q) * [-sqrt(q)*delta(1) -sqrt(q)*delta(2) 0; ...
+                      delta(2) -delta(1) -q ];
+        Hl = (1/q) * [sqrt(q)*delta(1) sqrt(q)*delta(2); ...
+                      -delta(2) delta(1)];
+        Hl = Hl * F;
+        
+        H = [Hp Hl];
+        %}
+        K = P_pre * H'  * ( H * P_pre * H' + measure_cov)^(-1);
         
         x_pre = x_pre + K * (z - z_est);
         KH = K*H;
