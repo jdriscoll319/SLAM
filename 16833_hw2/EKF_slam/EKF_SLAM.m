@@ -145,7 +145,6 @@ while ischar(tline)
                          delta(2) -delta(1) -q -delta(2) delta(1)] ;
         H = H_low * F;
         
-
         K = P_pre * H'  * ( H * P_pre * H' + measure_cov)^(-1);
         
         x_pre = x_pre + K * (z - z_est);
