@@ -16,10 +16,10 @@ function [x, R] = solve_chol2(A, b)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%% Your code goes here %%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%AtA = A' * A;
-%p = symamd(AtA);
-%R = chol(AtA(p,p));
-[R,~,S] = chol(A' * A);
-y = forward_sub(R', S'*A'*b);
-x = back_sub(R*S', y);
+
+[R,~,s] = chol(A'*A, 'vector');
+y = forward_sub(R', A(:,s)'*b);
+x = back_sub(R, y);
+x(s) = x;
+
 end
