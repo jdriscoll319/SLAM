@@ -70,10 +70,10 @@ Hm_r = Hm(1:2, 1:2);
 %Landmark part of Hm
 Hm_l = Hm(1:2, 3:4);
 
-Ap = horzcat(eye(2), zeros(2, n_odom*2+n_landmarks*2));
+Ap = horzcat(eye(2), zeros(2, N-2));
 bp = zeros(2,1);
 
-Ao = zeros(n_odom*2, n_odom*2+n_landmarks*2+2);
+Ao = zeros(n_odom*2, N);
 bo = zeros(numel(odom),1);
 for i = 1:size(odom, 1)
     Ao(i*2-1:i*2, i*2-1:i*2+2) = Ho;
@@ -81,7 +81,7 @@ for i = 1:size(odom, 1)
 end
 %A(3:numel(odom)+2, 1:numel(odom)+4) = Ao;
 
-Al = zeros(n_obs*2, 2200);
+Al = zeros(n_obs*2, N);
 bl = zeros(n_obs*2, 1);
 lm_offset = n_odom*2+2;
 for i = 1:size(obs, 1)

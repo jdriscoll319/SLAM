@@ -44,12 +44,59 @@ N = p_dim*n_poses + l_dim*n_landmarks;
 M = o_dim*(n_odom+1) + m_dim*n_obs;         % +1 for prior on the first pose
 
 %% Initialize matrices
-A = zeros(M, N);
-b = zeros(M, 1);
+%A = zeros(M, N);
+%b = zeros(M, 1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%% Your code goes here %%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Ho = [-1 0 1 0;
+      0 -1 0 1];
+Ho = sqrt(inv(sigma_o))*Ho;
+
+
+Ap = horzcat(eye(2), zeros(2, N-2));
+bp = zeros(2,1);
+
+Ao = zeros(n_odom*2, N);
+bo = zeros(numel(odom),1);
+for i = 1:size(odom, 1)
+    Ao(i*2-1:i*2, i*2-1:i*2+2) = Ho;
+    curr_bo = odom(i,:)' - meas_odom(x(i*2-1), x(i*2), x(i*2+1), x(i*2+2));
+    bo(i*2-1:i*2) = sqrt(inv(sigma_o))*curr_bo;
+end
+%A(3:numel(odom)+2, 1:numel(odom)+4) = Ao;
+
+Al = zeros(n_obs*2, N);
+bl = zeros(n_obs*2, 1);
+lm_offset = n_odom*2+2;
+for i = 1:size(obs, 1)
+    r = obs(i,1);
+    l = obs(i,2);
+    l_pos = [obs(i,3); obs(i,4)];
+    
+    Hm = meas_landmark_jacobian(x(r+2), x(r+3), l_pos(1), l_pos(2));
+    Hm = sqrt(inv(sigma_l))*Hm;
+    %Robot part of Hm
+    Hm_r = Hm(1:2, 1:2);
+    %Landmark part of Hm
+    Hm_l = Hm(1:2, 3:4);
+    
+    %insert robot part of Hm
+    Al(i*2-1:i*2, r*2-1:r*2) = Hm_r;
+    
+    %insert landmark part of Hm
+    Al(i*2-1:i*2, l*2-1+lm_offset:l*2+lm_offset) = Hm_l;
+    
+    curr_bl = odom(i,:)' - meas_landmark(x(i*2+1), x(i*2+2), l_pos(1), l_pos(2));
+    bl(i*2-1:i*2) = sqrt(inv(sigma_l))*curr_bl;
+end
+
+%A(numel(odom)+3:end, 1:end) = Al;
+A = vertcat(Ap, Ao, Al);
+b = vertcat(bp, bo, bl);
+
 
 %% Make A a sparse matrix 
 As = sparse(A);
