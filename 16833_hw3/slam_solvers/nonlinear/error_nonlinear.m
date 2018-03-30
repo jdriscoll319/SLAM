@@ -49,3 +49,33 @@ err = 0;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%% Your code goes here %%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+bp = zeros(2,1);
+
+bo = zeros(numel(odom),1);
+for i = 1:size(odom, 1)
+    curr_bo = odom(i,:)' - meas_odom(x(i*2-1), x(i*2), x(i*2+1), x(i*2+2));
+    bo(i*2-1:i*2) = sqrt(inv(sigma_odom))*curr_bo;
+end
+
+bl = zeros(n_obs*2, 1);
+for i = 1:size(obs, 1)
+    r = obs(i,1);
+    l = obs(i,2);
+    l_pos = [ obs(i,3);
+              obs(i,4) ];
+    r_est = [ x(r*2-1); 
+              x(r*2) ];
+    l_est = [ x(l*2+n_poses+1); 
+              x(l*2+n_poses+2) ];
+    
+    curr_bl = l_pos - meas_landmark(r_est(1), r_est(2), l_est(1), l_est(2));
+    curr_bl(1) = wrapToPi(curr_bl(1));
+    bl(i*2-1:i*2) = sqrt(inv(sigma_landmark))*curr_bl;
+end
+
+b = vertcat(bp, bo, bl);
+
+[err, ~] = sumsqr(b);
+
+end

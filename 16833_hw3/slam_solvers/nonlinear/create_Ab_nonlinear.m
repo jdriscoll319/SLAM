@@ -63,6 +63,7 @@ Ao = zeros(n_odom*2, N);
 bo = zeros(numel(odom),1);
 for i = 1:size(odom, 1)
     Ao(i*2-1:i*2, i*2-1:i*2+2) = Ho;
+    
     curr_bo = odom(i,:)' - meas_odom(x(i*2-1), x(i*2), x(i*2+1), x(i*2+2));
     bo(i*2-1:i*2) = sqrt(inv(sigma_o))*curr_bo;
 end
@@ -72,14 +73,16 @@ Al = zeros(n_obs*2, N);
 bl = zeros(n_obs*2, 1);
 lm_offset = n_odom*2+2;
 for i = 1:size(obs, 1)
-    r = obs(i,1);
-    l = obs(i,2);
+    r_id = obs(i,1);
+    l_id = obs(i,2);
+    
     l_pos = [ obs(i,3);
               obs(i,4) ];
-    r_est = [ x(r); 
-             x(r+1) ];
-    l_est = [ x(l*2+n_poses+1); 
-              x(l*2+n_poses+2) ];
+    
+    r_est = [ x(r_id * 2 - 1); 
+              x(r_id * 2) ];
+    l_est = [ x(l_id * 2 + n_poses*2 - 1); 
+              x(l_id * 2 + n_poses*2) ];
     
     Hm = meas_landmark_jacobian(r_est(1), r_est(2), l_est(1), l_est(2));
     Hm = sqrt(inv(sigma_l))*Hm;
@@ -89,12 +92,13 @@ for i = 1:size(obs, 1)
     Hm_l = Hm(1:2, 3:4);
     
     %insert robot part of Hm
-    Al(i*2-1:i*2, r*2-1:r*2) = Hm_r;
+    Al(i*2-1:i*2, r_id*2-1:r_id*2) = Hm_r;
     
     %insert landmark part of Hm
-    Al(i*2-1:i*2, l*2-1+lm_offset:l*2+lm_offset) = Hm_l;
+    Al(i*2-1:i*2, l_id*2-1+lm_offset:l_id*2+lm_offset) = Hm_l;
     
     curr_bl = l_pos - meas_landmark(r_est(1), r_est(2), l_est(1), l_est(2));
+    curr_bl(1) = wrapToPi(curr_bl(1));
     bl(i*2-1:i*2) = sqrt(inv(sigma_l))*curr_bl;
 end
 
