@@ -74,9 +74,14 @@ lm_offset = n_odom*2+2;
 for i = 1:size(obs, 1)
     r = obs(i,1);
     l = obs(i,2);
-    l_pos = [obs(i,3); obs(i,4)];
+    l_pos = [ obs(i,3);
+              obs(i,4) ];
+    r_est = [ x(r); 
+             x(r+1) ];
+    l_est = [ x(l*2+n_poses+1); 
+              x(l*2+n_poses+2) ];
     
-    Hm = meas_landmark_jacobian(x(r+2), x(r+3), l_pos(1), l_pos(2));
+    Hm = meas_landmark_jacobian(r_est(1), r_est(2), l_est(1), l_est(2));
     Hm = sqrt(inv(sigma_l))*Hm;
     %Robot part of Hm
     Hm_r = Hm(1:2, 1:2);
@@ -89,7 +94,7 @@ for i = 1:size(obs, 1)
     %insert landmark part of Hm
     Al(i*2-1:i*2, l*2-1+lm_offset:l*2+lm_offset) = Hm_l;
     
-    curr_bl = odom(i,:)' - meas_landmark(x(i*2+1), x(i*2+2), l_pos(1), l_pos(2));
+    curr_bl = l_pos - meas_landmark(r_est(1), r_est(2), l_est(1), l_est(2));
     bl(i*2-1:i*2) = sqrt(inv(sigma_l))*curr_bl;
 end
 
