@@ -50,7 +50,7 @@ function [tform valid_pair_num error] = getRigidTransform(new_pointcloud, ref_po
         %==== TODO: Solve for the 6-vector xi[] of rigid body transformation ====
 
         % Write your code here...
-        xi = pinv(A)*b;
+        xi = A\b;
 
         %==== Coerce xi[] back into SE(3) ====
         %==== (Notice: tmp_tform[] is defined in the format of right-multiplication) ====

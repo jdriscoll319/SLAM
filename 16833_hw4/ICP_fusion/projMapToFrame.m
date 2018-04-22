@@ -21,60 +21,61 @@ function [proj_map, proj_flag] = projMapToFrame(fusion_map, h, w, tform, cam_par
     t = T(1:3,end);
     R = T(1:3, 1:3);
     P = K*[R t];
-    V = [fusion_map.pointcloud.Location'; ones(1, size(fusion_map.pointcloud.Location, 1))];
-    color = fusion_map.pointcloud.Color';
-    N = fusion_map.normals';
+    V = [fusion_map.pointcloud.Location ones(size(fusion_map.pointcloud.Location, 1), 1)];
+    color = fusion_map.pointcloud.Color;
+    N = fusion_map.normals;
     c = fusion_map.ccounts;
     time = fusion_map.times;
     
     %%
     %First just transform the points to camera frame and find the negative
     %Z's
-    cam_points = T*V;
+    cam_points = T*V';
     cam_points = cam_points ./ cam_points(4,:);
-    neg_z = any(cam_points(3,:) < 0, 1);  %%Index of negative z's
+    neg_z = any(cam_points(3,:) < 0, 1)';  %%Index of negative z's
     
     %%
     %Project points onto camera frame and find points outside the frame
-    to_cam_plane = P*V;
+    to_cam_plane = P*V';
     %normalize that shit
-    to_cam_plane = round( to_cam_plane./to_cam_plane(3,:) );
+    to_cam_plane = round( to_cam_plane./to_cam_plane(3,:) )';
     
-    outside_frame = any(to_cam_plane(1,:) <= 0 | ...
-                        to_cam_plane(2,:) <= 0 | ...
-                        to_cam_plane(1,:) > w  | ...
-                        to_cam_plane(2,:) > h, 1);
+    outside_frame = any(to_cam_plane(:,1) <= 0 | ...
+                        to_cam_plane(:,2) <= 0 | ...
+                        to_cam_plane(:,1) > w  | ...
+                        to_cam_plane(:,2) > h, 2);
 
     %%
     %Dump all of the bad indices in everything to zero
     bad_indices = logical(neg_z + outside_frame);
-    V(:,bad_indices) = 0;
-    proj_flag = (~bad_indices)';
+    V(bad_indices, :) = 0;
+    proj_flag = find(~bad_indices);
     
     %%
     %convert to 3D matrix
-    proj_points = zeros(h,w,3);
-    proj_colors = zeros(h,w,3);
-    proj_normals = zeros(h,w,3);
-    proj_ccounts = zeros(h,w);
-    proj_times = zeros(h,w);
+    proj_points = zeros(h*w,3);
+    proj_colors = zeros(h*w,3);
+    proj_normals = zeros(h*w,3);
+    proj_ccounts = zeros(h*w,1);
+    proj_times = zeros(h*w,1);
     
-    for i = 1:numel(bad_indices)
-        if ~bad_indices(i)
-            x = to_cam_plane(1,i);
-            y = to_cam_plane(2,i);
-            
-            proj_points(y, x, :) = V(1:3, i);
-            
-            proj_colors(y, x, :) = color(:, i);
-            
-            proj_normals(y, x, :) = N(:, i);
-            
-            proj_ccounts(y, x) = c(i);
-            proj_times(y,x) = time(i);
-        end
-    end
+    y = to_cam_plane(proj_flag,2);
+    x = to_cam_plane(proj_flag,1);
     
+    proj_points( sub2ind([h w], y, x), : ) = V(proj_flag, 1:3);
+    proj_points = reshape(proj_points, h, w, 3);
+    
+    proj_colors( sub2ind([h w], y, x), : ) = color(proj_flag, :);
+    proj_colors = reshape(proj_colors, h, w, 3);
+    
+    proj_normals( sub2ind([h w], y, x), : ) = N(proj_flag, :);
+    proj_normals = reshape(proj_normals, h, w, 3);
+    
+    proj_ccounts( sub2ind([h w], y, x)) = c(proj_flag);
+    proj_ccounts = reshape(proj_ccounts, h, w);
+    
+    proj_times( sub2ind([h w], y, x)) = time(proj_flag);
+    proj_times = reshape(proj_times, h, w);
  
     %==== Output the projected map in a struct ====
     %==== (Notice: proj_points[], proj_colors[], and proj_normals[] are all 3D matrices with size h*w*3) ====
