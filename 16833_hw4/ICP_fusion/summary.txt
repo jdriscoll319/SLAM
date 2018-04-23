@@ -1,0 +1,33 @@
+ICP_FUSION
+[Warning: File not found or permission denied] 
+[> In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('ICP_FUSION', 'D:\School\SLAM\16833_hw4\ICP_fusion\ICP_FUSION.m', 28)" style="font-weight:bold">ICP_FUSION</a> (<a href="matlab: opentoline('D:\School\SLAM\16833_hw4\ICP_fusion\ICP_FUSION.m',28,0)">line 28</a>)] 
+Frame#: 1 (ICP and Point-based fusion initialized)
+Frame#: 2 (ICP final iteration: inliers = 1186, RMSE = 9.847533e-03)
+Frame#: 3 (ICP final iteration: inliers = 1186, RMSE = 1.012370e-02)
+Frame#: 4 (ICP final iteration: inliers = 1115, RMSE = 1.003838e-02)
+Frame#: 5 (ICP final iteration: inliers = 1096, RMSE = 9.990332e-03)
+Frame#: 6 (ICP final iteration: inliers = 1178, RMSE = 9.920652e-03)
+Frame#: 7 (ICP final iteration: inliers = 1190, RMSE = 9.800884e-03)
+Frame#: 8 (ICP final iteration: inliers = 1189, RMSE = 9.005463e-03)
+Frame#: 9 (ICP final iteration: inliers = 1182, RMSE = 8.670208e-03)
+Frame#: 10 (ICP final iteration: inliers = 1163, RMSE = 8.966219e-03)
+Frame#: 11 (ICP final iteration: inliers = 1144, RMSE = 9.221605e-03)
+Frame#: 12 (ICP final iteration: inliers = 1113, RMSE = 9.886510e-03)
+Frame#: 13 (ICP final iteration: inliers = 1182, RMSE = 8.354244e-03)
+Frame#: 14 (ICP final iteration: inliers = 1182, RMSE = 8.866431e-03)
+Frame#: 15 (ICP final iteration: inliers = 1138, RMSE = 8.906602e-03)
+Frame#: 16 (ICP final iteration: inliers = 1141, RMSE = 9.142732e-03)
+Frame#: 17 (ICP final iteration: inliers = 1183, RMSE = 9.135596e-03)
+Frame#: 18 (ICP final iteration: inliers = 1147, RMSE = 1.063182e-02)
+Frame#: 19 (ICP final iteration: inliers = 1167, RMSE = 9.804937e-03)
+Frame#: 20 (ICP final iteration: inliers = 1142, RMSE = 9.770769e-03)
+Frame#: 21 (ICP final iteration: inliers = 1179, RMSE = 8.518054e-03)
+Frame#: 22 (ICP final iteration: inliers = 1170, RMSE = 9.061484e-03)
+Frame#: 23 (ICP final iteration: inliers = 1169, RMSE = 9.440667e-03)
+Frame#: 24 (ICP final iteration: inliers = 1172, RMSE = 9.265516e-03)
+Frame#: 25 (ICP final iteration: inliers = 1174, RMSE = 8.795496e-03)
+Frame#: 26 (ICP final iteration: inliers = 1176, RMSE = 8.959335e-03)
+______________________________________________________________________
+Number of points in the final model = 591895 
+Compression ratio = 7.41 % 
+Total time spent = 12.79 sec 
