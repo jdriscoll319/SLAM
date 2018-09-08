@@ -1,5 +1,7 @@
 # SLAM
  HW Assignments for Localization and Mapping
+ 
+ Writeups for each assignment are titled "jdriscol_hw#.pdf"
 
 1 - Particle Filter - https://github.com/jphaneuf/grudslam
 
